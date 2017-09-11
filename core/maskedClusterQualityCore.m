@@ -1,5 +1,5 @@
 
-function [unitQuality, contaminationRate] = maskedClusterQualityCore(fetThisCluster, fetOtherClusters)
+function [unitQuality, contaminationRate, LRatio] = maskedClusterQualityCore(fetThisCluster, fetOtherClusters)
 % fetThisCluster and fetOtherClusters are size [nSpikes, nFeatures]
 
 
@@ -18,9 +18,14 @@ if nOther > n && n>nFet
 
     unitQuality = md(n);
     contaminationRate = 1-tippingPoint(mdSelf, md)/numel(mdSelf);
+    
+    df = nFet;
+    L = sum(1-chi2cdf(md,df));
+    LRatio = L/n;
 else
     unitQuality = 0;
     contaminationRate = NaN;
+    LRatio = NaN;
 end
 
 end

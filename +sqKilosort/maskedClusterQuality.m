@@ -1,5 +1,5 @@
 
-function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualityKilosort(resultsDirectory)
+function [clusterIDs, unitQuality, contaminationRate, LRatio] = maskedClusterQualityKilosort(resultsDirectory)
 
 fprintf(1, 'loading data...\n');
 %% Precompute the locationsn of files to be loaded
@@ -44,7 +44,7 @@ if exist(spikeClustersPath,'file')
     %tempNums = 1:nTemplates;
     
     for c = 1:length(clusterIDs)
-%         fprintf(1, '%d/%d\n', c, length(clusterIDs))
+        fprintf(1, '%d/%d\r', c, length(clusterIDs))
         thisID = clusterIDs(c);
         
         theseSpikes = spike_clusters==thisID;
@@ -52,10 +52,11 @@ if exist(spikeClustersPath,'file')
         [inclTemps, inst] = countUnique(theseTemplates); 
         
         thisTemplate = inclTemps(inst==max(inst),1);
+%         fprintf(1, '%d\n', length(thisTemplate(:,1)))
         
-        theseChans = pc_feature_ind(thisTemplate,1:nFet);
-        
-        
+%         theseChans = pc_feature_ind(thisTemplate,1:nFet);
+        % dirty fix in case two templates have SAME number of spikes
+        theseChans = unique(pc_feature_ind(thisTemplate,1:nFet), 'rows');
         
         newFetInds(c,:) = theseChans;
         
@@ -92,7 +93,7 @@ end
 assert(numel(size(pc_features)) == 3)
 
 fprintf(1, 'computing cluster qualities...\n');
-[clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(spike_clusters, pc_features, pc_feature_ind);
+[clusterIDs, unitQuality, contaminationRate, LRatio] = maskedClusterQualitySparse(spike_clusters, pc_features, pc_feature_ind);
 
 
 

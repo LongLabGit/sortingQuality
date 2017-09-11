@@ -1,6 +1,6 @@
 
 
-function isiV = isiViolations(resultsDirectory)
+function isiV = isiViolations(resultsDirectory, refDur, minISI)
 
 %% Precompute the locationsn of files to be loaded
 spikeClustersPath = fullfile(resultsDirectory,'spike_clusters.npy');
@@ -10,8 +10,8 @@ paramsPath= fullfile(resultsDirectory,'params.py');
 
 %% 
 
-refDur = 0.0015;
-minISI = 0.0005;
+% refDur = 0.0015;
+% minISI = 0.0005;
 
 fprintf(1, 'loading data for ISI computation\n');
 if exist(spikeClustersPath)
@@ -19,15 +19,27 @@ if exist(spikeClustersPath)
 else
     spike_clusters = readNPY(spikeTemplatesPath);
 end
-spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
+% spike_clusters = spike_clusters + 1; % because in Python indexes start at 0
 
 spike_times = readNPY(spikeTimesPath);
 params = readKSparams(paramsPath);
 spike_times = double(spike_times)/params.sample_rate;
 
+clust_group=importdata(fullfile(resultsDirectory,'cluster_group.tsv'));
+clusterLabels = cell(length(clust_group) - 1, 2);
+for i = 1:length(clust_group) - 1
+    line = textscan(clust_group{i+1},'%d %s');
+    clusterLabels{i, 1} = line{2};
+    clusterLabels{i, 2} = line{1};
+end
+
+goodClusterNames = strcmp([clusterLabels{:,1}],'good');
+goodSpikeIndices = ismember(spike_clusters, [clusterLabels{goodClusterNames,2}]);
+clusterIDs = unique(spike_clusters(goodSpikeIndices));
+
 fprintf(1, 'computing ISI violations\n');
 
-clusterIDs = unique(spike_clusters);
+% clusterIDs = unique(spike_clusters);
 isiV = zeros(1,numel(clusterIDs));
 for c = 1:numel(clusterIDs)
     

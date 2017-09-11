@@ -1,6 +1,6 @@
 
 
-function [clusterIDs, unitQuality, contaminationRate] = maskedClusterQualitySparse(clu, fet, fetInds, fetNchans)
+function [clusterIDs, unitQuality, contaminationRate, LRatio] = maskedClusterQualitySparse(clu, fet, fetInds, fetNchans)
 % - clu is 1 x nSpikes
 % - fet is nSpikes x nPCsPerChan x nInclChans
 % - fetInds is nClusters x nInclChans (sorted in descending order of
@@ -20,6 +20,7 @@ assert(fetNchans <= size(fet, 3) && size(fet, 1) == N , 'bad input(s)')
 clusterIDs = unique(clu);
 unitQuality = zeros(size(clusterIDs));
 contaminationRate = zeros(size(clusterIDs));
+LRatio = zeros(size(clusterIDs));
 
 fprintf('%12s\tQuality\tContamination\n', 'ID'); % comment to suppress printing out the intermediate results
 for c = 1:numel(clusterIDs)
@@ -90,10 +91,11 @@ for c = 1:numel(clusterIDs)
     
     fetOtherClusters = reshape(fetOtherClusters, size(fetOtherClusters,1), []);
     
-    [uQ, cR] = maskedClusterQualityCore(fetThisCluster, fetOtherClusters);
+    [uQ, cR, LR] = maskedClusterQualityCore(fetThisCluster, fetOtherClusters);
     
     unitQuality(c) = uQ;
     contaminationRate(c) = cR;
+    LRatio(c) = LR;
     
     fprintf('cluster %3d: \t%6.1f\t%6.2f\n', clusterIDs(c), unitQuality(c), contaminationRate(c)); % comment to suppress printing out the intermediate results
     
