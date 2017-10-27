@@ -1,5 +1,3 @@
-
-
 function [clusterIDs, unitQuality, contaminationRate, LRatio] = maskedClusterQualitySparse(clu, fet, fetInds, fetNchans)
 % - clu is 1 x nSpikes
 % - fet is nSpikes x nPCsPerChan x nInclChans
@@ -22,7 +20,7 @@ unitQuality = zeros(size(clusterIDs));
 contaminationRate = zeros(size(clusterIDs));
 LRatio = zeros(size(clusterIDs));
 
-fprintf('%12s\tQuality\tContamination\n', 'ID'); % comment to suppress printing out the intermediate results
+% fprintf('%12s\tQuality\tContamination\n', 'ID'); % comment to suppress printing out the intermediate results
 for c = 1:numel(clusterIDs)
     
     theseSp = clu==clusterIDs(c);
@@ -97,7 +95,7 @@ for c = 1:numel(clusterIDs)
     contaminationRate(c) = cR;
     LRatio(c) = LR;
     
-    fprintf('cluster %3d: \t%6.1f\t%6.2f\n', clusterIDs(c), unitQuality(c), contaminationRate(c)); % comment to suppress printing out the intermediate results
+%     fprintf('cluster %3d: \t%6.1f\t%6.2f\n', clusterIDs(c), unitQuality(c), contaminationRate(c)); % comment to suppress printing out the intermediate results
     
     if uQ>1000
         keyboard;

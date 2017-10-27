@@ -22,6 +22,27 @@ if nOther > n && n>nFet
     df = nFet;
     L = sum(1-chi2cdf(md,df));
     LRatio = L/n;
+elseif nOther<n && n>nFet%i.e. too few other cluster spikes, but still enough same cluser spikes
+%     disp('Not enough spikes in noise cluster, downsampling this one')
+    [LRatio,unitQuality,contaminationRate]=deal(nan(1,100));
+    for i=1:100
+        inds=sort(randperm(n,floor(nOther/10)));
+        md = mahal(fetOtherClusters, fetThisCluster(inds,:));
+        md = sort(md);
+
+        mdSelf = mahal(fetThisCluster, fetThisCluster(inds,:));
+        mdSelf = sort(mdSelf);
+
+        unitQuality(i) = md(length(inds));
+        contaminationRate(i) = 1-tippingPoint(mdSelf, md)/numel(mdSelf);
+
+        df = nFet;
+        L = sum(1-chi2cdf(md,df));
+        LRatio(i) = L/length(inds);
+    end
+    unitQuality = median(unitQuality);
+    contaminationRate = median(contaminationRate);
+    LRatio = median(LRatio);
 else
     unitQuality = 0;
     contaminationRate = NaN;

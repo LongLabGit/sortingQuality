@@ -44,21 +44,21 @@ if exist(spikeClustersPath,'file')
     %tempNums = 1:nTemplates;
     
     for c = 1:length(clusterIDs)
-        fprintf(1, '%d/%d\r', c, length(clusterIDs))
-        thisID = clusterIDs(c);
+%         fprintf(1, '%d/%d\r', c, length(clusterIDs))
+        thisID = clusterIDs(c);%current cluster ID
         
-        theseSpikes = spike_clusters==thisID;
+        theseSpikes = spike_clusters==thisID;%spikes that beloing to it
         theseTemplates = spike_templates(theseSpikes);
         [inclTemps, inst] = countUnique(theseTemplates); 
         
-        thisTemplate = inclTemps(inst==max(inst),1);
+        thisTemplate = inclTemps(find(inst==max(inst),1,'first'),1);
 %         fprintf(1, '%d\n', length(thisTemplate(:,1)))
         
 %         theseChans = pc_feature_ind(thisTemplate,1:nFet);
         % dirty fix in case two templates have SAME number of spikes
         theseChans = unique(pc_feature_ind(thisTemplate,1:nFet), 'rows');
-        
         newFetInds(c,:) = theseChans;
+        
         
         %subPCFetInd = pc_features(theseSpikes,:,:);
         
